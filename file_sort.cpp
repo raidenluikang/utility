@@ -3,14 +3,15 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <vector>
 #include <cassert>
 #include <algorithm>
 #include <string>
-#include <format>
 #include <set>
 
-const size_t MEMORY_LIMIT = 64; // 64 Kbytes
+const size_t MEMORY_LIMIT = 64*1054; // 64 Kbytes
 
 int file_sort(const char* infile, const char* outfile)
 {
@@ -18,9 +19,22 @@ int file_sort(const char* infile, const char* outfile)
     FILE* in = fopen(infile, "r");
     if (!in)return -2;
     
-    std::string tmp_in;
+    char* tmp_in;
     int tmp_idx = 0;
+    int infile_length = strlen(infile);
+    tmp_in = (char*)malloc(infile_length + 30);
+    if (!tmp_in) return -3;
+    memset(tmp_in, 0, infile_length + 30);
 
+    strncpy(tmp_in, infile, infile_length);
+    tmp_in[infile_length++] = '_';
+    tmp_in[infile_length++] = 't';
+    tmp_in[infile_length++] = 'm';
+    tmp_in[infile_length++] = 'p';
+    tmp_in[infile_length++] = '_';
+    tmp_in[infile_length] = '\0';
+
+    
     std::vector<int> nums;
     nums.reserve(MEMORY_LIMIT / sizeof(int));
     int x;
@@ -30,8 +44,14 @@ int file_sort(const char* infile, const char* outfile)
         if (nums.size() >= MEMORY_LIMIT / sizeof(int))
         {
             std::sort(nums.begin(), nums.end());
-            tmp_in = std::format("{}_tmp_{}", infile, ++tmp_idx);
-            FILE* in_x = fopen(tmp_in.c_str(), "w");
+            ++tmp_idx;
+            int ix, idx;
+            for (ix = infile_length, idx = tmp_idx; idx != 0; idx /= 10, ++ix)
+            {
+                tmp_in[ix] = idx % 10 + '0';
+            }
+            tmp_in[ix] = '\0';
+            FILE* in_x = fopen(tmp_in, "w");
             for (int x : nums) fprintf(in_x, "%d ", x);
             fclose(in_x);
             nums.clear();
@@ -40,8 +60,14 @@ int file_sort(const char* infile, const char* outfile)
     if (nums.size() > 0)
     {
         std::sort(nums.begin(), nums.end());
-        tmp_in = std::format("{}_tmp_{}", infile, ++tmp_idx);
-        FILE* in_x = fopen(tmp_in.c_str(), "w");
+        ++tmp_idx;
+        int ix, idx;
+        for (ix = infile_length, idx = tmp_idx; idx != 0; idx /= 10, ++ix)
+        {
+            tmp_in[ix] = idx % 10 + '0';
+        }
+        tmp_in[ix] = '\0';
+        FILE* in_x = fopen(tmp_in, "w");
         for (int x : nums) fprintf(in_x, "%d ", x);
         fclose(in_x);
         nums.clear();
@@ -58,10 +84,16 @@ int file_sort(const char* infile, const char* outfile)
     std::multiset<tag> st;
     for (int i = 1; i <= tmp_idx; ++i)
     {
-        tmp_in = std::format("{}_tmp_{}", infile, i);
+        //tmp_in = std::format("{}_tmp_{}", infile, i);
+        int ix, idx;
+        for (ix = infile_length, idx = i; idx != 0; idx /= 10, ++ix)
+        {
+            tmp_in[ix] = idx % 10 + '0';
+        }
+        tmp_in[ix] = '\0';
 
         tag g;
-        g.f = fopen(tmp_in.c_str(), "r");
+        g.f = fopen(tmp_in, "r");
         if (1 == fscanf(g.f, "%d", &g.x))
         {
             st.insert(g);
@@ -70,6 +102,7 @@ int file_sort(const char* infile, const char* outfile)
             assert(false);
         }
     }
+    
 
     FILE* out = fopen(outfile, "w");
     while (!st.empty())
@@ -89,24 +122,31 @@ int file_sort(const char* infile, const char* outfile)
 
     for (int i = 1; i <= tmp_idx; ++i)
     {
-        tmp_in = std::format("{}_tmp_{}", infile, i);
-        ::remove(tmp_in.c_str());
+        int ix, idx;
+        for (ix = infile_length, idx = i; idx != 0; idx /= 10, ++ix)
+        {
+            tmp_in[ix] = idx % 10 + '0';
+        }
+        tmp_in[ix] = '\0';
+
+        ::remove(tmp_in);
     }
     fclose(out);
-
+    free(tmp_in);
     return 0;
 }
 
 int main(int argc, char* argv[])
 {
-
+#if 0
     if (argc != 3) {
         puts("ERROR: <program> <in-file> <out-file>");
         return -1;
     }
 
     return file_sort(argv[1], argv[2]);
-  //  file_sort("input.txt", "output.txt");
+#endif
+      file_sort("input.txt", "output.txt");
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
