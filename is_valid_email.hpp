@@ -2,7 +2,6 @@
 
 #include <stddef.h> // size_t
 
-
 /*
 (?:(?:[^<>()\[\].,;:\s@"]+(?:\.[^<>()\[\].,;:\s@"]+)*)|".+")@(?:(?:[^<>()\[\].,;:\s@"]+\.)+[^<>()\[\].,;:\s@"]{2,})
 [^<>()\[\].,;:\s@"] = T
@@ -128,7 +127,7 @@ constexpr bool is_valid_email_me(const char* str, size_t len) noexcept
 		{
 		    // B: str[x] ... str[len-1]:  total len -x
 		    // A: str[0] ... str[x-2]  :  total x - 1
-		    return is_valid_domain(str + x, len - x) && is_valid_name(str, x - 1);
+		    return is_valid_email_domain(str + x, len - x) && is_valid_email_name(str, x - 1);
 		}
 	}
 	return false;
@@ -138,6 +137,6 @@ template <typename StringLike> // std::string, std::string_view or some similar 
 bool is_valid_email_me(const StringLike& email) { 
 	const auto pos = email.rfind('@');
 	const auto size = email.size();
-	return pos != email.npos  && is_valid_name(email.data(), pos) && is_valid_domain(email.data() + pos + 1, size - (pos + 1));
+	return pos != email.npos  && is_valid_email_name(email.data(), pos) && is_valid_email_domain(email.data() + pos + 1, size - (pos + 1));
 	//return is_valid_email_me(email.c_str(), email.size()); 
 }
