@@ -15,11 +15,8 @@
 name = (?:(?:T+(?:\.T+)*)|".+")  ==> if avoid group ==>  T+(\.T+)*|".+"   -> T+(\.T+)*  OR  ".+"
 domain = (?:(?:T+\.)+T{2,})        ==> if avoid group ==>  (T+\.)+T{2,}   --> s1 . s2 . ... . sn   every si -> is T,  and strlen(sn) >= 2
 */
+ 
 
-namespace utils{
-  
-
-  
 constexpr bool is_valid_email_symbol(const char c) noexcept
 {
     switch(c)
