@@ -63,6 +63,13 @@ constexpr bool is_valid_email_name(const char* str, size_t len) noexcept
 	{
 		if (len <= 2) return false;
 		if (str[len-1] != '\"') return false;
+		
+		// dot not matched to line feed
+		for (size_t x = 1; x < len - 1; ++x) 
+		{
+			if (str[x] == '\n') return false;
+		}
+		
 		return true;
 	}
 	
